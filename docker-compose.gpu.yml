@@ -13,9 +13,9 @@ services:
               count: 1
               capabilities: [gpu]
     environment:
-      - ASR_MODEL=base
+      - ASR_MODEL=large-v3
     ports:
-      - "9000:9000"
+      - "9090:9000"
     volumes:
       - ./app:/app/app
       - cache-whisper:/root/.cache

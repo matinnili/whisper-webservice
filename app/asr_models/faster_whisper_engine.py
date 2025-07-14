@@ -57,13 +57,15 @@ class FasterWhisperASR(ASRModel):
             for segment in segment_generator:
                 segments.append(segment)
                 text = text + segment.text
-            result = {"language": options_dict.get("language", info.language), "segments": segments, "text": text}
+            # result = {"language": options_dict.get("language", info.language), "segments": segments, "text": text}
+            result={"text":text}
+        return result
 
-        output_file = StringIO()
-        self.write_result(result, output_file, output)
-        output_file.seek(0)
+        # output_file = StringIO()
+        # self.write_result(result, output_file, output)
+        # output_file.seek(0)
 
-        return output_file
+        # return output_file
 
     def language_detection(self, audio):
 
