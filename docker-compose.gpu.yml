@@ -13,7 +13,7 @@ services:
               count: 1
               capabilities: [gpu]
     environment:
-      - ASR_MODEL=large-v3
+      - ASR_MODEL=turbo
     ports:
       - "9090:9000"
     volumes:

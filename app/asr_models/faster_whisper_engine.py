@@ -5,25 +5,44 @@ from typing import BinaryIO, Union
 
 import whisper
 from faster_whisper import WhisperModel
-
+import os
+from transformers import AutoProcessor, AutoModelForSpeechSeq2Seq
+from ctranslate2.converters import TransformersConverter as Converter
 from app.asr_models.asr_model import ASRModel
 from app.config import CONFIG
 from app.utils import ResultWriter, WriteJSON, WriteSRT, WriteTSV, WriteTXT, WriteVTT
+from faster_whisper import WhisperModel
+import shutil
 
 
 class FasterWhisperASR(ASRModel):
 
     def load_model(self):
 
-        self.model = WhisperModel(
-            model_size_or_path=CONFIG.MODEL_NAME,
-            device=CONFIG.DEVICE,
-            compute_type=CONFIG.MODEL_QUANTIZATION,
-            download_root=CONFIG.MODEL_PATH
-        )
+        processor = AutoProcessor.from_pretrained("vhdm/whisper-large-fa-v1")
+        model = AutoModelForSpeechSeq2Seq.from_pretrained("vhdm/whisper-large-fa-v1")
+        os.makedirs("original",exist_ok=True)
+        os.makedirs("fa", exist_ok=True)
+        processor.save_pretrained("original")
+        model.save_pretrained("original")
+        convert_class=Converter("original")
+        print("Files in original directory:", os.listdir("original"))
+        model_size = "./fa"
+        convert_class.convert("fa",force=True)
+        shutil.copy("original/tokenizer_config.json", "fa/tokenizer_config.json")
+        shutil.copy("original/preprocessor_config.json", "fa/preprocessor_config.json")
+        print("Files in fa directory:", os.listdir("fa"))
+        self.model = WhisperModel(model_size,device=CONFIG.DEVICE,compute_type=CONFIG.MODEL_QUANTIZATION)
+
+        # self.model = WhisperModel(
+        #     model_size_or_path=CONFIG.MODEL_NAME,
+        #     device=CONFIG.DEVICE,
+        #     compute_type=CONFIG.MODEL_QUANTIZATION,
+        #     download_root=CONFIG.MODEL_PATH
+        # )
 
         Thread(target=self.monitor_idleness, daemon=True).start()
-
+    
     def transcribe(
             self,
             audio,
