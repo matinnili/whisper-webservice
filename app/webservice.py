@@ -145,7 +145,7 @@ async def detect_language(
 )
 @click.version_option(version=projectMetadata["Version"])
 def start(host: str, port: Optional[int] = None):
-    uvicorn.run(app, host=host, port=port)
+    uvicorn.run(app, host=host, port=port,timeout_keep_alive=12000)
 
 
 if __name__ == "__main__":
